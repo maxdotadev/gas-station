@@ -1,10 +1,16 @@
 package com.hackathon.unknown.gasstation;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
+import android.view.View;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -20,6 +26,8 @@ public class ListDirection extends AppCompatActivity {
     ArrayList<DirectionStep> arrayList;
     ItemDirections itemDirections;
 
+    DatabaseSQL db;
+    ImageButton imgbtnLove;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +36,30 @@ public class ListDirection extends AppCompatActivity {
 
         arrayList = new ArrayList<>();
         lvDirections = (ListView) findViewById(R.id.listViewDirection);
+
+        imgbtnLove = (ImageButton) findViewById(R.id.imageButtonLove);
+        imgbtnLove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                imgbtnLove.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.affeact_button));
+
+                db = new DatabaseSQL(getApplicationContext());
+
+                SQLiteDatabase database = db.getWritableDatabase();
+
+        /*String insertLopHoc = "INSERT INTO lophocandroid (tenlop,namhoc)" + "VALUES (\"" + tenlop + "\"," + namhoc + ");";
+        database.execSQL(insertLopHoc);*/
+
+                ContentValues values = new ContentValues();
+                values.put("Name", getIntent().getExtras().getString("data1"));
+                values.put("Address", getIntent().getExtras().getString("data2"));
+
+                database.insert("AndroidK217T26", null, values);
+
+                Toast.makeText(ListDirection.this, "Lưu thành công", Toast.LENGTH_SHORT).show();
+                
+            }
+        });
 
         Intent intent = getIntent();
         parseJSon(intent.getExtras().getString("data"));

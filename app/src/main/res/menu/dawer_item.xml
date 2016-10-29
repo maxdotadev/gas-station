@@ -6,6 +6,9 @@
             android:id="@+id/item1"
             android:title="@string/menu_item_1" />
         <item
+            android:id="@+id/item00"
+            android:title="@string/menu_item_00" />
+        <item
             android:id="@+id/item2"
             app:actionLayout = "@layout/nv_switch"
             android:title="@string/menu_item_2" />
@@ -35,7 +38,7 @@
                         android:title="@string/menu_item_7"/>
                     <item
                         android:id="@+id/item8"
-                        android:icon="@drawable/item8"
+                        android:icon="@drawable/item88"
                         android:title="@string/menu_item_8"/>
                     <item
                         android:id="@+id/item9"

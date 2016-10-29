@@ -22,7 +22,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -75,9 +74,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final int LOCATION_DIFF = 500;
     private static final String SEARCH_TYPE_GAS_STATION = "gas_station";
     private static final String SEARCH_TYPE_HOSPITAL = "hospital";
-    private static final String SEARCH_TYPE_SCHOOL = "school";
+    private static final String SEARCH_TYPE_UNIVERSITY = "university";
     private static final String SEARCH_TYPE_RESTAURANT = "restaurant";
-    private static final String SEARCH_TYPE_POST_OFFICE = "post_station";
+    private static final String SEARCH_TYPE_SHOPPING_MALL = "shopping_mall";
     private static final String SEARCH_TYPE_BUS_STATION = "bus_station";
     private static final String SEARCH_TYPE_BANK = "bank";
 
@@ -98,6 +97,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     ProgressDialog progressDialog;
     Polyline mPolyline;
     String path;
+    String sName, sAddress;
     //            +"&destination="+"&language=vi";
     String ss = null;
     ArrayList<DirectionStep> arrayList;
@@ -249,9 +249,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 // Configure the view
                 TextView txtTitle = (TextView) snackView.findViewById(R.id.textViewTitle);
                 txtTitle.setText(place.getName());
+                sName = place.getName();
 
                 TextView txtAddress = (TextView) snackView.findViewById(R.id.textViewAddress);
                 txtAddress.setText(place.getVicinity());
+                sAddress = place.getVicinity();
 
                 Button btnDirecton = (Button) snackView.findViewById(R.id.buttonDirection);
                 btnDirecton.setOnClickListener(new View.OnClickListener() {
@@ -409,7 +411,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void getDetailDirections() {
         Intent intent = new Intent(this, ListDirection.class);
         Bundle bundle = new Bundle();
-        MarkerOptions markerOptions;
+        bundle.putString("data1", sName);
+        bundle.putString("data2", sAddress);
         bundle.putString("data", ss);
         intent.putExtras(bundle);
         startActivity(intent);
@@ -522,6 +525,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             case R.id.item1:
                 mDrawer.closeDrawer(GravityCompat.START);
                 break;
+            case R.id.item00:
+                Intent intent = new Intent(this, ListFavorite.class);
+                startActivity(intent);
+                break;
             case R.id.item2:
                 SwitchCompat switchCompat = (SwitchCompat) findViewById(R.id.nv_switch);
                 switchCompat.toggle();
@@ -552,13 +559,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 showProgressDialog();
                 break;
             case R.id.item8:
-                mSearchType = SEARCH_TYPE_POST_OFFICE;
+                mSearchType = SEARCH_TYPE_SHOPPING_MALL;
                 retrieveNearbyPlaces();
                 mDrawer.closeDrawer(GravityCompat.START);
                 showProgressDialog();
                 break;
             case R.id.item9:
-                mSearchType = SEARCH_TYPE_SCHOOL;
+                mSearchType = SEARCH_TYPE_UNIVERSITY;
                 retrieveNearbyPlaces();
                 mDrawer.closeDrawer(GravityCompat.START);
                 showProgressDialog();

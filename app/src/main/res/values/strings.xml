@@ -5,16 +5,17 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <string name="action_settings">Settings</string>
-    <string name="menu_item_1">Direction</string>
+    <string name="action_settings">Cài đặt</string>
+    <string name="menu_item_1">Chỉ đường</string>
+    <string name="menu_item_00">Yêu thích</string>
     <string name="menu_item_2">Popup</string>
-    <string name="menu_item_3">Option :</string>
-    <string name="menu_item_4">Hospital</string>
-    <string name="menu_item_5">Bank</string>
-    <string name="menu_item_6">Gas Station</string>
-    <string name="menu_item_7">Bus</string>
-    <string name="menu_item_8">Post Office</string>
-    <string name="menu_item_9">School</string>
-    <string name="menu_item_10">Restaurant</string>
+    <string name="menu_item_3">Lựa chọn :</string>
+    <string name="menu_item_4">Bệnh viện</string>
+    <string name="menu_item_5">Ngân hàng</string>
+    <string name="menu_item_6">Trạm xăng</string>
+    <string name="menu_item_7">Trạm xe buýt</string>
+    <string name="menu_item_8">Trung tâm mua sắm</string>
+    <string name="menu_item_9">Trường đại học</string>
+    <string name="menu_item_10">Nhà hàng</string>
 
 </resources>
