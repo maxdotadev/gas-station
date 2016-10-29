@@ -13,10 +13,17 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SwitchCompat;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
@@ -63,8 +70,8 @@ import retrofit2.Response;
 
 import static com.hackathon.unknown.gasstation.R.id.map;
 
-public class MainActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
-        LocationListener, View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
+        LocationListener, View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
     private static final int LOCATION_DIFF = 500;
     private static final String SEARCH_TYPE_GAS_STATION = "gas_station";
     private static final String SEARCH_TYPE_HOSPITAL = "hospital";
@@ -82,7 +89,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private Location mCurrentLocation;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
-    private String mSearchType = SEARCH_TYPE_SCHOOL;
+    private String mSearchType = null;
 
 
     RelativeLayout relativeLayout;
@@ -96,10 +103,44 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     ArrayList<DirectionStep> arrayList;
 
 
+    DrawerLayout mDrawer;
+    NavigationView mDrawView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(tb);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+
+        mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mDrawer, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+            }
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+            }
+        };
+        mDrawer.addDrawerListener(toggle);
+
+        mDrawView = (NavigationView) findViewById(R.id.nvView);
+        mDrawView.setNavigationItemSelectedListener(this);
+        mDrawer.openDrawer(GravityCompat.START);
+
+        toggle.syncState();
+        tb.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDrawer.openDrawer(GravityCompat.START);
+            }
+        });
 
         initData();
         getPreviousLocation();
@@ -139,6 +180,9 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void retrieveNearbyPlaces() {
+        if (mSearchType == null) {
+            return;
+        }
         Call<PlacesResult> call = mPlacesService.getNearbyPlaces(mCurrentLocation.getLatitude() + "," + mCurrentLocation.getLongitude(),
                 "distance", mSearchType, "AIzaSyBOwSkOFPCw7zf0R-6wGnrcAWNH2oP_RKM");
         call.enqueue(new Callback<PlacesResult>() {
@@ -162,6 +206,9 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                                 mHandler.post(new Runnable() {
                                     @Override
                                     public void run() {
+                                        if (bitmap == null) {
+                                            return;
+                                        }
                                         marker.setIcon(BitmapDescriptorFactory.fromBitmap(bitmap));
                                         marker.setVisible(true);
                                     }
@@ -171,8 +218,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                     }).start();
                     marker.setTag(i);
                     place.updateDistance(mCurrentLocation);
-                    Log.e("result", place.getPlaceId() + " at " + place.getVicinity());
                 }
+                progressDialog.hide();
             }
 
             @Override
@@ -333,7 +380,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onLocationChanged(Location location) {
-        if (location.distanceTo(mCurrentLocation) > LOCATION_DIFF) {
+        if (mCurrentLocation == null || location.distanceTo(mCurrentLocation) > LOCATION_DIFF) {
             mCurrentLocation = location;
             processLocationChanges();
         }
@@ -343,7 +390,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.buttonDirections:
+            case R.id.buttonDirection:
                 arrayList = new ArrayList<>();
                 getDirections();
                 progressDialog = new ProgressDialog(this);
@@ -438,7 +485,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 options.title("Điểm đến");
 
                 options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-                mMarker=mGoogleMap.addMarker(options);
+                mMarker = mGoogleMap.addMarker(options);
                 lineOption.width(5);
                 lineOption.color(Color.BLUE);
                 mPolyline = mGoogleMap.addPolyline(lineOption);
@@ -466,5 +513,70 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.item1:
+                mDrawer.closeDrawer(GravityCompat.START);
+                break;
+            case R.id.item2:
+                SwitchCompat switchCompat = (SwitchCompat) findViewById(R.id.nv_switch);
+                switchCompat.toggle();
+//                mDrawer.closeDrawer(GravityCompat.START);
+                break;
+            case R.id.item4:
+                mSearchType = SEARCH_TYPE_HOSPITAL;
+                retrieveNearbyPlaces();
+                mDrawer.closeDrawer(GravityCompat.START);
+                showProgressDialog();
+                break;
+            case R.id.item5:
+                mSearchType = SEARCH_TYPE_BANK;
+                retrieveNearbyPlaces();
+                mDrawer.closeDrawer(GravityCompat.START);
+                showProgressDialog();
+                break;
+            case R.id.item6:
+                mSearchType = SEARCH_TYPE_GAS_STATION;
+                retrieveNearbyPlaces();
+                mDrawer.closeDrawer(GravityCompat.START);
+                showProgressDialog();
+                break;
+            case R.id.item7:
+                mSearchType = SEARCH_TYPE_BUS_STATION;
+                retrieveNearbyPlaces();
+                mDrawer.closeDrawer(GravityCompat.START);
+                showProgressDialog();
+                break;
+            case R.id.item8:
+                mSearchType = SEARCH_TYPE_POST_OFFICE;
+                retrieveNearbyPlaces();
+                mDrawer.closeDrawer(GravityCompat.START);
+                showProgressDialog();
+                break;
+            case R.id.item9:
+                mSearchType = SEARCH_TYPE_SCHOOL;
+                retrieveNearbyPlaces();
+                mDrawer.closeDrawer(GravityCompat.START);
+                showProgressDialog();
+                break;
+            case R.id.item10:
+                mSearchType = SEARCH_TYPE_RESTAURANT;
+                retrieveNearbyPlaces();
+                mDrawer.closeDrawer(GravityCompat.START);
+                showProgressDialog();
+                break;
+        }
+        return true;
+    }
+
+    private void showProgressDialog() {
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setTitle("Thông Báo");
+        progressDialog.setMessage("Đang Tải Địa Điểm....");
+        progressDialog.show();
     }
 }

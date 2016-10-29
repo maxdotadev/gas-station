@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/item1"
+            android:title="@string/menu_item_1" />
+        <item
+            android:id="@+id/item2"
+            app:actionLayout = "@layout/nv_switch"
+            android:title="@string/menu_item_2" />
+
+        <item
+            android:id="@+id/item3"
+            android:title="@string/menu_item_3" >
+            <menu>
+                <group
+                    android:checkableBehavior="single"
+                    android:id="@+id/result">
+                        <item
+                            android:id="@+id/item4"
+                            android:icon="@drawable/item4"
+                            android:title="@string/menu_item_4"/>
+                    <item
+                        android:id="@+id/item5"
+                        android:icon="@drawable/item5"
+                        android:title="@string/menu_item_5"/>
+                    <item
+                        android:id="@+id/item6"
+                        android:icon="@drawable/item6"
+                        android:title="@string/menu_item_6"/>
+                    <item
+                        android:id="@+id/item7"
+                        android:icon="@drawable/item7"
+                        android:title="@string/menu_item_7"/>
+                    <item
+                        android:id="@+id/item8"
+                        android:icon="@drawable/item8"
+                        android:title="@string/menu_item_8"/>
+                    <item
+                        android:id="@+id/item9"
+                        android:icon="@drawable/item9"
+                        android:title="@string/menu_item_9"/>
+                    <item
+                        android:id="@+id/item10"
+                        android:icon="@drawable/item10"
+                        android:title="@string/menu_item_10"/>
+
+                </group>
+            </menu>
+        </item>
+    </group>
+
+</menu>

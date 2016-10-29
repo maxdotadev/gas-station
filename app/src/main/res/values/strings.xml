@@ -1,3 +1,20 @@
 <resources>
-    <string name="app_name">Gas Station</string>
+    <string name="app_name">Mapkathon</string>
+    <string name="title_activity_get">get</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="menu_item_1">Direction</string>
+    <string name="menu_item_2">Popup</string>
+    <string name="menu_item_3">Option :</string>
+    <string name="menu_item_4">Hospital</string>
+    <string name="menu_item_5">Bank</string>
+    <string name="menu_item_6">Gas Station</string>
+    <string name="menu_item_7">Bus</string>
+    <string name="menu_item_8">Post Office</string>
+    <string name="menu_item_9">School</string>
+    <string name="menu_item_10">Restaurant</string>
+
 </resources>
