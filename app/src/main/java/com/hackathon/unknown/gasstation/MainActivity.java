@@ -89,6 +89,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     private String mSearchType = null;
+    private ArrayList<Marker> mActiveMarkers;
+    private GooglePlace mDestination;
 
 
     RelativeLayout relativeLayout;
@@ -97,7 +99,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     ProgressDialog progressDialog;
     Polyline mPolyline;
     String path;
-    String sName, sAddress;
     //            +"&destination="+"&language=vi";
     String ss = null;
     ArrayList<DirectionStep> arrayList;
@@ -177,12 +178,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void initData() {
         mHandler = new Handler();
         mPlacesService = RetrofitHelper.getInstance().getPlacesService();
+        mActiveMarkers = new ArrayList<>();
     }
 
     public void retrieveNearbyPlaces() {
         if (mSearchType == null) {
             return;
         }
+
         Call<PlacesResult> call = mPlacesService.getNearbyPlaces(mCurrentLocation.getLatitude() + "," + mCurrentLocation.getLongitude(),
                 "distance", mSearchType, "AIzaSyBOwSkOFPCw7zf0R-6wGnrcAWNH2oP_RKM");
         call.enqueue(new Callback<PlacesResult>() {
@@ -190,6 +193,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onResponse(Call<PlacesResult> call, Response<PlacesResult> response) {
                 mResult = response.body();
                 mGoogleMap.clear();
+                mActiveMarkers.clear();
                 Toast.makeText(MainActivity.this, "Tìm thấy " + mResult.getResults().size() + " địa chỉ gần bạn", Toast.LENGTH_SHORT).show();
                 for (int i = 0; i < mResult.getResults().size(); i++) {
                     final GooglePlace place = mResult.getResults().get(i);
@@ -198,6 +202,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     place.getGeometry().getLocation().lng))
                             .title(place.getName())
                             .visible(false));
+                    mActiveMarkers.add(marker);
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -206,11 +211,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 mHandler.post(new Runnable() {
                                     @Override
                                     public void run() {
-                                        if (bitmap == null) {
-                                            return;
+                                        if (mActiveMarkers.contains(marker)) {
+                                            marker.setIcon(BitmapDescriptorFactory.fromBitmap(bitmap));
+                                            marker.setVisible(true);
                                         }
-                                        marker.setIcon(BitmapDescriptorFactory.fromBitmap(bitmap));
-                                        marker.setVisible(true);
                                     }
                                 });
                             }
@@ -235,7 +239,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mGoogleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
+                if (marker.getTag() == null) {
+                    return false;
+                }
                 final GooglePlace place = mResult.getResults().get((Integer) marker.getTag());
+                mDestination = place;
 
                 Snackbar snackbar = Snackbar.make(findViewById(R.id.activity_main), "", Snackbar.LENGTH_LONG);
 // Get the Snackbar's layout view
@@ -249,11 +257,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 // Configure the view
                 TextView txtTitle = (TextView) snackView.findViewById(R.id.textViewTitle);
                 txtTitle.setText(place.getName());
-                sName = place.getName();
 
                 TextView txtAddress = (TextView) snackView.findViewById(R.id.textViewAddress);
                 txtAddress.setText(place.getVicinity());
-                sAddress = place.getVicinity();
 
                 Button btnDirecton = (Button) snackView.findViewById(R.id.buttonDirection);
                 btnDirecton.setOnClickListener(new View.OnClickListener() {
@@ -411,8 +417,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void getDetailDirections() {
         Intent intent = new Intent(this, ListDirection.class);
         Bundle bundle = new Bundle();
-        bundle.putString("data1", sName);
-        bundle.putString("data2", sAddress);
+        bundle.putString("data1", mDestination.getName());
+        bundle.putString("data2", mDestination.getVicinity());
+        bundle.putDouble("lat", mDestination.getGeometry().getLocation().lat);
+        bundle.putDouble("lng", mDestination.getGeometry().getLocation().lng);
         bundle.putString("data", ss);
         intent.putExtras(bundle);
         startActivity(intent);
@@ -522,18 +530,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.item1:
-                mDrawer.closeDrawer(GravityCompat.START);
-                break;
+//            case R.id.item1:
+//                mDrawer.closeDrawer(GravityCompat.START);
+//                break;
             case R.id.item00:
                 Intent intent = new Intent(this, ListFavorite.class);
-                startActivity(intent);
+                startActivityForResult(intent, 10);
                 break;
-            case R.id.item2:
-                SwitchCompat switchCompat = (SwitchCompat) findViewById(R.id.nv_switch);
-                switchCompat.toggle();
+//            case R.id.item2:
+//                SwitchCompat switchCompat = (SwitchCompat) findViewById(R.id.nv_switch);
+//                switchCompat.toggle();
 //                mDrawer.closeDrawer(GravityCompat.START);
-                break;
+//                break;
             case R.id.item4:
                 mSearchType = SEARCH_TYPE_HOSPITAL;
                 retrieveNearbyPlaces();
@@ -585,5 +593,69 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         progressDialog.setTitle("Thông Báo");
         progressDialog.setMessage("Đang Tải Địa Điểm....");
         progressDialog.show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mDrawer.isDrawerOpen(GravityCompat.START)) {
+            mDrawer.closeDrawer(GravityCompat.START);
+            return;
+        }
+        super.onBackPressed();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 10 && resultCode == RESULT_OK) {
+            if (mDrawer.isDrawerOpen(GravityCompat.START)) {
+                mDrawer.closeDrawer(GravityCompat.START);
+            }
+            final GooglePlace place = new GooglePlace(data.getStringExtra("name"),
+                    data.getStringExtra("address"), data.getDoubleExtra("lat", 0),
+                    data.getDoubleExtra("lng", 0));
+
+            Snackbar snackbar = Snackbar.make(findViewById(R.id.activity_main), "", Snackbar.LENGTH_LONG);
+// Get the Snackbar's layout view
+            Snackbar.SnackbarLayout layout = (Snackbar.SnackbarLayout) snackbar.getView();
+// Hide the text
+            TextView textView = (TextView) layout.findViewById(android.support.design.R.id.snackbar_text);
+            textView.setVisibility(View.INVISIBLE);
+
+// Inflate our custom view
+            View snackView = getLayoutInflater().inflate(R.layout.snackbar_layout, null);
+// Configure the view
+            TextView txtTitle = (TextView) snackView.findViewById(R.id.textViewTitle);
+            txtTitle.setText(place.getName());
+
+            TextView txtAddress = (TextView) snackView.findViewById(R.id.textViewAddress);
+            txtAddress.setText(place.getVicinity());
+
+            Button btnDirecton = (Button) snackView.findViewById(R.id.buttonDirection);
+            btnDirecton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mPolyline != null) {
+                        mPolyline.remove();
+                    }
+                    if (mMarker != null) {
+                        mMarker.remove();
+                    }
+                    path = "http://maps.googleapis.com/maps/api/directions/json?origin=" + mCurrentLocation.getLatitude() + "," + mCurrentLocation.getLongitude() + "&destination=" + place.getGeometry().getLocation().lat + "," + place.getGeometry().getLocation().lng + "&language=vi";
+                    arrayList = new ArrayList<>();
+                    getDirections();
+                    progressDialog = new ProgressDialog(MainActivity.this);
+                    progressDialog.setTitle("Thông Báo");
+                    progressDialog.setMessage("Đang thực hiện....");
+                    progressDialog.show();
+                }
+            });
+
+// Add the view to the Snackbar's layout
+            layout.addView(snackView, 0);
+// Show the Snackbar
+            snackbar.show();
+        }
     }
 }

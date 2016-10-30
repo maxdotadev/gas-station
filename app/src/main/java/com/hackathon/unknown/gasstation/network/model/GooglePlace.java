@@ -17,6 +17,12 @@ public class GooglePlace {
     private GoogleGeometry geometry;
     private double mDistance; // in meter
 
+    public GooglePlace(String name, String address, double lat, double lng) {
+        this.name = name;
+        this.vicinity = address;
+        geometry = new GoogleGeometry(lat, lng);
+    }
+
     public GoogleGeometry getGeometry() {
         return geometry;
     }

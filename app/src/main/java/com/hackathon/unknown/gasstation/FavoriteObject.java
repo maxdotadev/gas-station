@@ -8,10 +8,14 @@ public class FavoriteObject {
 
     String name;
     String address;
+    double lat;
+    double lng;
 
-    public FavoriteObject(String name, String address) {
+    public FavoriteObject(String name, String address, double lat, double lng) {
         this.name = name;
         this.address = address;
+        this.lat = lat;
+        this.lng = lng;
     }
 
     public String getName() {
@@ -28,5 +32,13 @@ public class FavoriteObject {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public double getLat() {
+        return lat;
+    }
+
+    public double getLng() {
+        return lng;
     }
 }

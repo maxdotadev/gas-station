@@ -53,6 +53,8 @@ public class ListDirection extends AppCompatActivity {
                 ContentValues values = new ContentValues();
                 values.put("Name", getIntent().getExtras().getString("data1"));
                 values.put("Address", getIntent().getExtras().getString("data2"));
+                values.put("lat", getIntent().getExtras().getDouble("lat"));
+                values.put("lng", getIntent().getExtras().getDouble("lng"));
 
                 database.insert("AndroidK217T26", null, values);
 

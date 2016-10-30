@@ -4,7 +4,6 @@
                 android:layout_height="192dp"
                 android:background="@color/colorPrimaryDark"
                 android:gravity="bottom"
-
                 android:orientation="vertical">
 
     <LinearLayout
@@ -18,20 +17,12 @@
             android:id="@+id/imageheader"
             android:layout_width="64dp"
             android:layout_height="64dp"
-            android:layout_alignBottom="@+id/text_header"
-            android:layout_marginLeft="16dp"
-            android:layout_marginStart="16dp"
             android:src="@drawable/gdg_program_icon"/>
 
         <TextView
             android:id="@+id/text_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_marginLeft="@dimen/text_header"
-            android:layout_marginStart="16dp"
-            android:layout_toEndOf="@id/imageheader"
-            android:layout_toRightOf="@id/imageheader"
             android:text="Unknown Group"
             android:textColor="@android:color/white"
             android:textSize="24dp"/>

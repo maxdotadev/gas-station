@@ -7,6 +7,12 @@ package com.hackathon.unknown.gasstation.network.model;
 public class GoogleGeometry {
     private GoogleLocation location;
 
+    public GoogleGeometry(double lat, double lng) {
+        location = new GoogleLocation();
+        location.lat = lat;
+        location.lng = lng;
+    }
+
     public GoogleLocation getLocation() {
         return location;
     }
